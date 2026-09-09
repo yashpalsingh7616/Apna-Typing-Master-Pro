@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — Apna Typing Master Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+body{background:var(--bg);display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}
+.login-wrap{width:100%;max-width:420px;padding:20px;}
+.login-logo{text-align:center;margin-bottom:28px;}
+.login-logo .logo-icon{width:48px;height:48px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 10px;}
+.login-logo h1{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--text);}
+.login-logo h1 span{color:var(--accent);}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px;}
+.login-title{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--text);margin-bottom:5px;}
+.login-sub{color:var(--muted);font-size:13px;margin-bottom:22px;}
+.auth-tabs{display:flex;margin-bottom:22px;background:var(--bg);border-radius:10px;padding:4px;}
+.auth-tab{flex:1;padding:9px;border:none;background:none;color:var(--muted);border-radius:8px;cursor:pointer;font-family:'DM Sans';font-weight:600;font-size:14px;transition:all .2s;}
+.auth-tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:black;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:500;}
+.field input,.field select{width:100%;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans';font-size:14px;outline:none;transition:border .2s;box-sizing:border-box;}
+.field input:focus,.field select:focus{border-color:var(--accent);}
+.field select option{background:var(--bg);}
+.btn-submit-auth{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:black;border:none;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer;font-family:'DM Sans';margin-top:4px;}
+.btn-submit-auth:hover{opacity:.9;}
+.error-msg{color:#ff6b6b;font-size:12px;margin-top:8px;display:none;}
+.back-link{text-align:center;margin-top:18px;font-size:13px;color:var(--muted);}
+.back-link a{color:var(--accent);text-decoration:none;font-weight:600;}
+</style>
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-logo">
+    <div class="logo-icon">⌨</div>
+    <h1>Apna Typing <span>Master</span> Pro</h1>
+  </div>
+  <div class="login-box">
+    <div class="login-title" id="loginTitle">Welcome Back 👋</div>
+    <div class="login-sub" id="loginSub">Apna account access karein</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Log In</button>
+      <button class="auth-tab" id="tabSignup" onclick="switchTab('signup')">Sign Up</button>
+    </div>
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <div class="field"><label>Email</label><input type="text" id="authLoginEmail" placeholder="example@email.com"/></div>
+      <div class="field"><label>Password</label><div class="pwd-wrap"><input type="password" id="authLoginPass" placeholder="••••••••"/><button type="button" class="pwd-toggle" onclick="togglePwd('authLoginPass',this)">👁</button></div></div>
+      <div class="error-msg" id="authLoginErr">❌ Email aur password dono likhein.</div>
+      <button class="btn-submit-auth" onclick="doLogin()">Log In →</button>
+      <div style="text-align:center;margin-top:12px;"><a href="#" onclick="openForgot();return false;" style="color:var(--accent);font-size:12px;text-decoration:none;font-weight:600;">Password bhool gaye?</a></div>
+    </div>
+    <!-- FORGOT PASSWORD FLOW -->
+    <div id="forgotForm" style="display:none;">
+      <div id="forgotStep1">
+        <div class="field"><label>Apna registered Email daalein</label><input type="email" id="forgotEmail" placeholder="example@email.com"/></div>
+        <div class="error-msg" id="forgotErr1"></div>
+        <div class="success-msg" id="forgotSuccess1" style="display:none;color:#2e7d32;background:#e8f9ee;border-radius:6px;padding:10px 12px;font-size:13px;margin-bottom:12px;"></div>
+        <button class="btn-submit-auth" id="forgotSendBtn" onclick="sendForgotResetLink()">Reset Link Bhejein →</button>
+      </div>
+      <div style="text-align:center;margin-top:14px;"><a href="#" onclick="closeForgot();return false;" style="color:var(--muted);font-size:12px;text-decoration:none;">← Log In par wapas</a></div>
+    </div>
+    <!-- SIGNUP FORM -->
+    <div id="signupForm" style="display:none;">
+      <div class="field"><label>Pura Naam</label><input type="text" id="authSignupName" placeholder="Aapka naam"/></div>
+      <div class="field"><label>Email Address</label><input type="email" id="authSignupEmail" placeholder="example@email.com"/></div>
+      <div class="field"><label>Password banayein</label><div class="pwd-wrap"><input type="password" id="authSignupPass" placeholder="Min. 6 characters"/><button type="button" class="pwd-toggle" onclick="togglePwd('authSignupPass',this)">👁</button></div></div>
+      <div class="field"><label>Preparing For</label>
+        <select id="authSignupExam">
+          <option>SSC CGL</option><option>SSC CHSL</option><option>RRB NTPC</option>
+          <option>High Court</option><option>UPSC</option><option>UPSSSC</option>
+          <option>Allahabad HC</option><option>KVS</option><option>State Exam</option>
+        </select>
+      </div>
+      <div class="error-msg" id="authSignupErr">❌ Sabhi fields bharna zaroori hai.</div>
+      <button class="btn-submit-auth" onclick="doSignup()">Account Banayein →</button>
+    </div>
+  </div>
+  <div class="back-link"><a href="index.html">← Home par wapas jayen</a></div>
+</div>
+<script src="shared.js"></script>
+<script src="anti-copy.js"></script>
+<script src="firebase-config.js"></script>
+<script type="module" src="firebase.js"></script>
+<script>
+loadSession();
+if(APP.loggedIn){ window.location.href='candidate.html'; }
+
+function switchTab(tab){
+  // Safety check - ensure elements exist
+  const loginForm = document.getElementById('loginForm');
+  const signupForm = document.getElementById('signupForm');
+  const tabLogin = document.getElementById('tabLogin');
+  const tabSignup = document.getElementById('tabSignup');
+  const loginTitle = document.getElementById('loginTitle');
+  const loginSub = document.getElementById('loginSub');
+  
+  // If elements don't exist, wait for DOM to load
+  if(!loginForm || !signupForm || !tabLogin || !tabSignup || !loginTitle || !loginSub){
+    console.warn('Login elements not ready yet, retrying...');
+    setTimeout(() => switchTab(tab), 100);
+    return;
+  }
+  
+  // Now safe to update elements
+  loginForm.style.display = tab==='login'?'block':'none';
+  signupForm.style.display = tab==='signup'?'block':'none';
+  tabLogin.classList.toggle('active', tab==='login');
+  tabSignup.classList.toggle('active', tab==='signup');
+  loginTitle.textContent = tab==='login'?'Welcome Back 👋':'Join Free Today 🚀';
+  loginSub.textContent = tab==='login'?'Apna account access karein':'India ke lakhs aspirants ke saath practice karein';
+}
+
+function doLogin(){
+  const email = document.getElementById('authLoginEmail').value.trim();
+  const pass  = document.getElementById('authLoginPass').value;
+  const err   = document.getElementById('authLoginErr');
+  err.style.display='none';
+  
+  // Validation
+  if(!email||!pass){ 
+    err.textContent='❌ Email aur password dono likhein.'; 
+    err.style.display='block'; 
+    return; 
+  }
+  
+  if(!email.includes('@')){ 
+    err.textContent='❌ Valid email likhein.'; 
+    err.style.display='block'; 
+    return; 
+  }
+  
+  if(pass.length<6){ 
+    err.textContent='❌ Password min 6 characters hona chahiye.'; 
+    err.style.display='block'; 
+    return; 
+  }
+  
+  // Firebase check
+  if(typeof window.fbLoginUser!=='function'){ 
+    err.textContent='⚠️ Firebase load nahi hua. Page refresh karein.'; 
+    err.style.display='block'; 
+    return; 
+  }
+  
+  const btn=document.querySelector('#loginForm .btn-submit-auth');
+  btn.disabled=true; 
+  btn.textContent='⏳ Log In ho raha hai...';
+  
+  // Login attempt with better error handling
+  window.fbLoginUser(email, pass)
+    .then((profile)=>{
+      // Success
+      APP.loggedIn=true; 
+      APP.name=profile.name||email.split('@')[0]; 
+      APP.email=email;
+      APP.isPro=!!profile.isPro;
+      
+      // Save session
+      if(typeof saveSession === 'function'){
+        saveSession();
+      }
+      
+      // Small delay for better UX
+      setTimeout(()=>{
+        window.location.href='candidate.html';
+      }, 300);
+    })
+    .catch(e=>{
+      btn.disabled=false; 
+      btn.textContent='Log In →';
+      
+      // Better error messages
+      let errorMsg = '';
+      if(e.code === 'auth/user-not-found'){
+        errorMsg = '❌ Email registered nahi hai. Account banayein.';
+      } else if(e.code === 'auth/wrong-password'){
+        errorMsg = '❌ Password galat hai. Bhul gaye? Reset karein.';
+      } else if(e.code === 'auth/too-many-requests'){
+        errorMsg = '❌ Bohot zyada attempts. Baad mein try karein.';
+      } else if(e.code === 'auth/network-request-failed'){
+        errorMsg = '❌ Internet connection check karein.';
+      } else if(e.code === 'auth/invalid-email'){
+        errorMsg = '❌ Email invalid hai.';
+      } else if(e.code === 'auth/user-disabled'){
+        errorMsg = '❌ Account disabled hai. Support se contact karein.';
+      } else if(e.message && e.message.includes('internal')){
+        errorMsg = '⚠️ Server mein temporary issue. 5 min mein try karein.';
+      } else {
+        errorMsg = '❌ Login failed: ' + (e.message || 'Unknown error');
+      }
+      
+      err.textContent = errorMsg;
+      err.style.display='block';
+      
+      // Log error for debugging
+      console.warn('Login error:', e.code, e.message);
+    });
+}
+function doSignup(){
+  const name  = document.getElementById('authSignupName').value.trim();
+  const email = document.getElementById('authSignupEmail').value.trim();
+  const pass  = document.getElementById('authSignupPass').value;
+  const exam  = document.getElementById('authSignupExam').value;
+  const err   = document.getElementById('authSignupErr');
+  err.style.display='none';
+  
+  // Validation
+  if(!name||!email||!pass||!exam){ 
+    err.textContent='❌ Sabhi fields bharna zaroori hai.'; 
+    err.style.display='block'; 
+    return; 
+  }
+  
+  if(name.length<3){ 
+    err.textContent='❌ Name kam se kam 3 characters hona chahiye.'; 
+    err.style.display='block'; 
+    return; 
+  }
+  
+  if(!email.includes('@')){ 
+    err.textContent='❌ Valid email likhein.'; 
+    err.style.display='block'; 
+    return; 
+  }
+  
+  if(pass.length<6){ 
+    err.textContent='❌ Password min 6 characters hona chahiye.'; 
+    err.style.display='block'; 
+    return; 
+  }
+  
+  // Firebase check
+  if(typeof window.fbSignupUser!=='function'){ 
+    err.textContent='⚠️ Firebase load nahi hua. Page refresh karein.'; 
+    err.style.display='block'; 
+    return; 
+  }
+  
+  const btn=document.querySelector('#signupForm .btn-submit-auth');
+  btn.disabled=true; 
+  btn.textContent='⏳ Account ban raha hai...';
+  
+  // Signup attempt with better error handling
+  window.fbSignupUser(name, email, pass, exam)
+    .then(()=>{
+      // Success
+      APP.loggedIn=true; 
+      APP.name=name; 
+      APP.email=email; 
+      APP.isPro=false;
+      
+      // Save session
+      if(typeof saveSession === 'function'){
+        saveSession();
+      }
+      
+      // Small delay for better UX
+      setTimeout(()=>{
+        window.location.href='candidate.html';
+      }, 300);
+    })
+    .catch(e=>{
+      btn.disabled=false; 
+      btn.textContent='Account Banayein →';
+      
+      // Better error messages
+      let errorMsg = '';
+      if(e.code === 'auth/email-already-in-use'){
+        errorMsg = '❌ Email pehle se registered hai. Login karein.';
+      } else if(e.code === 'auth/weak-password'){
+        errorMsg = '❌ Password weak hai. Strong password likho (6+ chars, numbers).';
+      } else if(e.code === 'auth/invalid-email'){
+        errorMsg = '❌ Email invalid hai.';
+      } else if(e.code === 'auth/network-request-failed'){
+        errorMsg = '❌ Internet connection check karein.';
+      } else if(e.code === 'auth/operation-not-allowed'){
+        errorMsg = '❌ Registration abhi band hai. Baad mein try karein.';
+      } else if(e.message && e.message.includes('internal')){
+        errorMsg = '⚠️ Server mein temporary issue. 5 min mein try karein.';
+      } else {
+        errorMsg = '❌ Signup failed: ' + (e.message || 'Unknown error');
+      }
+      
+      err.textContent = errorMsg;
+      err.style.display='block';
+      
+      // Log error for debugging
+      console.warn('Signup error:', e.code, e.message);
+    });
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Enter'){ if(document.getElementById('loginForm').style.display!=='none') doLogin(); else doSignup(); }});
+
+function openForgot(){
+  document.getElementById('loginForm').style.display='none';
+  document.getElementById('signupForm').style.display='none';
+  document.getElementById('forgotForm').style.display='block';
+  document.getElementById('forgotStep1').style.display='block';
+  document.getElementById('forgotSuccess1').style.display='none';
+  document.getElementById('forgotErr1').style.display='none';
+  document.getElementById('forgotEmail').disabled=false;
+  document.getElementById('forgotSendBtn').style.display='inline-block';
+  document.getElementById('loginTitle').textContent='Password Reset 🔑';
+  document.getElementById('loginSub').textContent='Email par password-reset link bheja jayega';
+  document.querySelector('.auth-tabs').style.display='none';
+}
+function closeForgot(){
+  document.getElementById('forgotForm').style.display='none';
+  document.querySelector('.auth-tabs').style.display='flex';
+  switchTab('login');
+}
+function sendForgotResetLink(){
+  const email = document.getElementById('forgotEmail').value.trim();
+  const err = document.getElementById('forgotErr1');
+  const success = document.getElementById('forgotSuccess1');
+  err.style.display='none';
+  success.style.display='none';
+  if(!email){ err.textContent='❌ Email daalein.'; err.style.display='block'; return; }
+  if(typeof window.fbSendResetOTP!=='function'){ err.textContent='Firebase abhi ready nahi hai, page refresh karein.'; err.style.display='block'; return; }
+  const btn=document.getElementById('forgotSendBtn');
+  btn.disabled=true; btn.textContent='Bheja ja raha hai...';
+  window.fbSendResetOTP(email).then(()=>{
+    success.textContent='✅ Password reset link bhej diya gaya hai. Apna email (Inbox/Spam) check karein aur link par click karke naya password set karein.';
+    success.style.display='block';
+    document.getElementById('forgotEmail').disabled=true;
+    btn.style.display='none';
+  }).catch(e=>{
+    btn.disabled=false; btn.textContent='Reset Link Bhejein →';
+    err.textContent='❌ '+e.message; err.style.display='block';
+  });
+}
+
+</script>
+</body>
+</html>
